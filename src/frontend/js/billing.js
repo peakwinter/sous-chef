@@ -1,29 +1,31 @@
-$(function() {
-    // Javascript of the billing application
-    // ****************************************
+/* eslint-env browser, jquery */
 
-    $('.billing-delete').click(function(){
-        var billing_id = $(this).attr('data-billing-id');
-        var selector = '.ui.basic.modal.billing-' + billing_id;
-        $(selector).modal('show');
-    });
+$(() => {
+  // Javascript of the billing application
+  // ****************************************
 
-    $('#billing_delivery_date').calendar({
-        type: 'month',
-        formatter: {
-            date: function (date, settings) {
-                if (!date) return '';
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-                if (month < 10) month = '0' + month;
-                return year + '-' + month ;
-            }
-        }
-    });
+  $('.billing-delete').click(() => {
+    const billingId = $(event.currentTarget).attr('data-billing-id');
+    const selector = `.ui.basic.modal.billing-${billingId}`;
+    $(selector).modal('show');
+  });
 
-    $('.add.icon').popup();
+  $('#billing_delivery_date').calendar({
+    type: 'month',
+    formatter: {
+      date: (date) => {
+        if (!date) return '';
+        let month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        if (month < 10) month = `0${month}`;
+        return `${year}-${month}`;
+      },
+    },
+  });
 
-    $("#create_billing").click(function(e){
-        $(".ui.dimmer").show();
-    });
+  $('.add.icon').popup();
+
+  $('#create_billing').click(() => {
+    $('.ui.dimmer').show();
+  });
 });

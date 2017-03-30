@@ -1,38 +1,38 @@
-$(function() {
+/* eslint-env browser, jquery */
 
-    // Javascript of the sous-chef application.
-    // **************************************
+function dateFormatter(date) {
+  if (!date) return '';
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  if (month < 10) month = `0${month}`;
+  if (day < 10) day = `0${day}`;
+  return `${year}-${month}-${day}`;
+}
 
-    $('.ui.open-menu').on('click', function() {
-        $('.ui.sidebar').sidebar('toggle');
-    });
+$(() => {
+  // Javascript of the sous-chef application.
+  // **************************************
 
-    $('.help-text').popup();
+  $('.ui.open-menu').on('click', () => {
+    $('.ui.sidebar').sidebar('toggle');
+  });
 
-    $('.message .close').on('click', function() {
-        $(this).closest('.message').transition('fade');
-    });
+  $('.help-text').popup();
 
-    $('.ui.accordion').accordion();
-    $('.ui.dropdown').dropdown({
-        transition: 'drop',
-        fullTextSearch: 'exact',
-        forceSelection: false
-    });
+  $('.message .close').on('click', () => {
+    $(this).closest('.message').transition('fade');
+  });
 
-    $('.ui.calendar').calendar({
-        type: 'date',
-        formatter: {
-            date: function (date, settings) {
-                if (!date) return '';
-                var day = date.getDate();
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-                if (month < 10) month = '0' + month;
-                if (day < 10) day = '0' + day;
-                return year + '-' + month + '-' + day;
-            }
-        }
-    });
+  $('.ui.accordion').accordion();
+  $('.ui.dropdown').dropdown({
+    transition: 'drop',
+    fullTextSearch: 'exact',
+    forceSelection: false,
+  });
 
+  $('.ui.calendar').calendar({
+    type: 'date',
+    formatter: {date: dateFormatter},
+  });
 });

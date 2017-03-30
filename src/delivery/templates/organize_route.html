@@ -39,7 +39,7 @@
         data-selected-vehicle="{{ route.vehicle }}"
         data-save-vehicle-url="{% if can_edit_data %}{% url 'delivery:save_route_vehicle' %}{% endif %}"
         data-can-save="{{ can_edit_data|yesno:'yes,no' }}">
-    {% leaflet_map "main" callback="main_map_init" %}
+    {% leaflet_map "main" callback="mainMapInit" %}
   </div>
   <div class="five wide column">
     <div class="controls"></div>

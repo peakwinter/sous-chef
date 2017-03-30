@@ -1,34 +1,35 @@
-$(function() {
+/* eslint-env browser, jquery */
 
-    // Javascript of the page application.
-    // **************************************
+$(() => {
+  // Javascript of the page application.
+  // **************************************
 
-    var form = $('.ui.large.form'),
-        usernameEmptyMsg = form.data('usernameEmptyMsg'),
-        passwordEmptyMsg = form.data('passwordEmptyMsg'),
-        passwordMinLengthMsg = form.data('passwordMinLengthMsg');
+  const form = $('.ui.large.form');
+  const usernameEmptyMsg = form.data('usernameEmptyMsg');
+  const passwordEmptyMsg = form.data('passwordEmptyMsg');
+  const passwordMinLengthMsg = form.data('passwordMinLengthMsg');
 
-    $('.ui.large.form').form({
-        on: 'submit',
-        revalidate: 'false',
-        fields: {
-            username: {
-                identifier: 'username',
-                rules: [{
-                    type   : 'empty',
-                    prompt : usernameEmptyMsg
-                }]
-            },
-            password: {
-                identifier: 'password',
-                rules: [{
-                    type   : 'empty',
-                    prompt : passwordEmptyMsg
-                    },{
-                    type   : 'minLength[6]',
-                    prompt : passwordMinLengthMsg
-                }]
-            }
-        }
-    })
+  $('.ui.large.form').form({
+    on: 'submit',
+    revalidate: 'false',
+    fields: {
+      username: {
+        identifier: 'username',
+        rules: [{
+          type: 'empty',
+          prompt: usernameEmptyMsg,
+        }],
+      },
+      password: {
+        identifier: 'password',
+        rules: [{
+          type: 'empty',
+          prompt: passwordEmptyMsg,
+        }, {
+          type: 'minLength[6]',
+          prompt: passwordMinLengthMsg,
+        }],
+      },
+    },
+  });
 });
