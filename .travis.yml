@@ -3,14 +3,21 @@ language: python
 python:
   - 3.5
 
+env:
+  - TRAVIS_NODE_VERSION="6"
+
 install:
   - pip install -r requirements.txt
   - pip install coveralls
   - pip install pep8
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
+  - cd tools/gulp && npm install --only=dev
 
 script:
+  - cd $TRAVIS_BUILD_DIR
   - PYTHONWARNINGS=once coverage run --omit=*.virtualenvs*,*virtualenv* src/manage.py test --settings=sous_chef.settings_test member meal order notification delivery note billing page
   - pep8 --count --show-source --exclude=migrations src/
+  - cd tools/gulp && npm -s run lint -- ../../src/frontend/js/**/*.js || (echo "ESLint check failed. See above output for info."; exit 1)
 
 after_success:
   - coveralls
