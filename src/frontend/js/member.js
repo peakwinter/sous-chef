@@ -63,11 +63,11 @@ $(() => {
     });
   });
 
-  var removeStatusConfirmationModal = $('#remove-status-confirmation');
-  $('a.remove-status').click(function (e) {
-      e.preventDefault();
-      removeStatusConfirmationModal.load(this.href);
-      removeStatusConfirmationModal.modal('show');
+  const removeStatusConfirmationModal = $('#remove-status-confirmation');
+  $('a.remove-status').click((event) => {
+    event.preventDefault();
+    removeStatusConfirmationModal.load(event.currentTarget.href);
+    removeStatusConfirmationModal.modal('show');
   });
 
   if ($('#dietary_restriction-delivery_type select').val() === 'E') {

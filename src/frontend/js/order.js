@@ -5,14 +5,14 @@ $(() => {
   // Javascript of the order application.
   // **************************************
 
-  var $overrideModal = $('.ui.order-override.modal');
+  const $overrideModal = $('.ui.order-override.modal');
 
-  $('#form_create_batch').submit(function(event) {
-    if(event.originalEvent && $('#id_is_submit').val() === '1') {
-      var originalTarget = $(event.originalEvent.explicitOriginalTarget);
-      var deliveryDates = ($('#id_delivery_dates').val() || '').split('|');
-      var overrideDates = ($('#id_override_dates').val() || '').split('|');
-      if(originalTarget.attr('id') === 'original-form-submit' &&
+  $('#form_create_batch').submit((event) => {
+    if (event.originalEvent && $('#id_is_submit').val() === '1') {
+      const originalTarget = $(event.originalEvent.explicitOriginalTarget);
+      const deliveryDates = ($('#id_delivery_dates').val() || '').split('|');
+      const overrideDates = ($('#id_override_dates').val() || '').split('|');
+      if (originalTarget.attr('id') === 'original-form-submit' &&
         $overrideModal.length && !arraysEqual(deliveryDates, overrideDates)) {
         event.preventDefault();
         $overrideModal.modal('show');
@@ -20,21 +20,20 @@ $(() => {
     }
   });
 
-  $('.order-override.cancel.button').click(function() {
-    var deliveryDates = ($('#id_delivery_dates').val() || '').split('|');
-    var datesToRemove = $overrideModal.data('orderDates').split('|');
-    var newDeliveryDates = deliveryDates.filter(function(i) {
-      return datesToRemove.indexOf(i) === -1;
-    });
+  $('.order-override.cancel.button').click(() => {
+    const deliveryDates = ($('#id_delivery_dates').val() || '').split('|');
+    const datesToRemove = $overrideModal.data('orderDates').split('|');
+    const newDeliveryDates = deliveryDates.filter(i =>
+      datesToRemove.indexOf(i) === -1);
 
     $('#id_delivery_dates').val(newDeliveryDates.join('|'));
-    $('#form_create_batch #id_is_submit').val("0");
+    $('#form_create_batch #id_is_submit').val('0');
     $('#form_create_batch').submit();
   });
 
-  $('.order-override.override.button').click(function() {
+  $('.order-override.override.button').click(() => {
     $('#id_override_dates').val($('#id_delivery_dates').val());
-    $('#form_create_batch #id_is_submit').val("1");
+    $('#form_create_batch #id_is_submit').val('1');
     $('#form_create_batch').submit();
   });
 
@@ -59,14 +58,14 @@ $(() => {
   }
 
   function arraysEqual(a, b) {
-      var sortA = a.map(function(i) { return !!i; }).sort();
-      var sortB = b.map(function(i) { return !!i; }).sort();
-      for (var i = 0; i < a.length; ++i) {
-        if (a[i] !== b[i]) {
-          return false;
-        }
+    const sortA = a.map(i => !!i).sort();
+    const sortB = b.map(i => !!i).sort();
+    for (let i = 0; i < a.length; i += 1) {
+      if (sortA[i] !== sortB[i]) {
+        return false;
       }
-      return true;
+    }
+    return true;
   }
 
   $('.ui.dropdown.order.status .menu > .item').click((event) => {
