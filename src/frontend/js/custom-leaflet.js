@@ -147,9 +147,9 @@ function mainMapInit(map) {
   bikerouter.options.profile = `mapbox/${defaultVehicle}`;
 
   // Extend Routing Plan to add more buttons
-  const RoutingPlan = L.Routing.Plan.extend({
-    createGeocoders: () => {
-      const container = L.Routing.Plan.prototype.createGeocoders.call(this);
+  class RoutingPlan extends L.Routing.Plan {
+    createGeocoders() {
+      const container = super.createGeocoders();
 
       // Create a button group for different route vehicles
       const div = L.DomUtil.create('div', '', container);
@@ -194,8 +194,8 @@ function mainMapInit(map) {
       // set default active button
       vehicleButtons[defaultVehicle].classList.add('active');
       return container;
-    },
-  });
+    }
+  }
 
   const plan = new RoutingPlan(
     // Empty waypoints
@@ -272,9 +272,9 @@ function mainMapInit(map) {
   );
 
   // Extend Routing Control to build sortable geocoder
-  const RoutingControl = L.Routing.Control.extend({
-    initialize: () => {
-      L.Routing.Control.prototype.initialize.call(this, {
+  class RoutingControl extends L.Routing.Control {
+    initialize() {
+      super.initialize({
         router: bikerouter,
         language: 'fr',
         showAlternatives: true,
@@ -295,8 +295,8 @@ function mainMapInit(map) {
         show: false,
         plan,
       });
-    },
-  });
+    }
+  }
 
   // Bind control outside of the map
   control = new RoutingControl();

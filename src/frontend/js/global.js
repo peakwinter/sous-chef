@@ -20,8 +20,8 @@ $(() => {
 
   $('.help-text').popup();
 
-  $('.message .close').on('click', () => {
-    $(this).closest('.message').transition('fade');
+  $('.message .close').on('click', (event) => {
+    $(event.currentTarget).closest('.message').transition('fade');
   });
 
   $('.ui.accordion').accordion();
