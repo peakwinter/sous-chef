@@ -4,6 +4,7 @@
 // ==========================================
 const gulp = require('gulp');
 const babel = require('gulp-babel');
+const sourcemaps = require('gulp-sourcemaps');
 const bytediff = require('gulp-bytediff');
 const minifycss = require('gulp-clean-css');
 const rename = require('gulp-rename');
@@ -120,36 +121,42 @@ gulp.task('styles', () =>
 gulp.task('scripts', () =>
   gulp.src([].concat(sources.js.scripts.vendor).concat(sources.js.scripts.site))
     .pipe(concat('sous-chef.js'))
-    .pipe(babel({presets: ['es2015']}))
+    .pipe(babel({presets: ['babel-preset-es2015'].map(require.resolve)}))
     .pipe(gulp.dest(destinations.js))
+    .pipe(sourcemaps.init())
     .pipe(bytediff.start())
     .pipe(uglify())
     .pipe(bytediff.stop(bytediffFormatter))
     .pipe(rename({ suffix: '.min' }))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destinations.js))
 );
 
 gulp.task('scripts-leaflet', () =>
   gulp.src([].concat(sources.js.leaflet.vendor).concat(sources.js.leaflet.site))
     .pipe(concat('leaflet.js'))
-    .pipe(babel({presets: ['es2015']}))
+    .pipe(babel({presets: ['babel-preset-es2015'].map(require.resolve)}))
     .pipe(gulp.dest(destinations.js))
+    .pipe(sourcemaps.init())
     .pipe(bytediff.start())
     .pipe(uglify())
     .pipe(bytediff.stop(bytediffFormatter))
     .pipe(rename({ suffix: '.min' }))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destinations.js))
 );
 
 gulp.task('scripts-multidatespicker', () =>
   gulp.src([].concat(sources.js.multiDatesPicker.vendor).concat(sources.js.multiDatesPicker.site))
     .pipe(concat('multidatespicker.js'))
-    .pipe(babel({presets: ['es2015']}))
+    .pipe(babel({presets: ['babel-preset-es2015'].map(require.resolve)}))
     .pipe(gulp.dest(destinations.js))
+    .pipe(sourcemaps.init())
     .pipe(bytediff.start())
     .pipe(uglify())
     .pipe(bytediff.stop(bytediffFormatter))
     .pipe(rename({ suffix: '.min' }))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destinations.js))
 );
 
