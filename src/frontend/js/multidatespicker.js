@@ -64,28 +64,6 @@ $(() => {
     });
   const orderedDateTooltip = $('#delivery_dates').data('orderedDateTooltip');
 
-
-  // Make it possible to disable the highlight of today.
-  // There are already two states: dates to create a new order, and dates
-  //  with existing orders.
-  // If we keep the highlight of today as the 3rd state, it would be
-  //  confusing to the user.
-  const oldUpdateDatepicker = $.datepicker._updateDatepicker;
-  $.datepicker._updateDatepicker = (inst) => {
-    const retVal = oldUpdateDatepicker.apply(this, arguments);
-    const disableTodayHighlight = this._get(inst, 'disableTodayHighlight');
-    if (disableTodayHighlight) {
-      // Remove display classes
-      const container = inst.dpDiv;
-      const todayTd = container.find('.ui-datepicker-today');
-      if (todayTd) {
-        const todayA = todayTd.find('a');
-        todayA.removeClass('ui-state-highlight ui-state-active ui-state-hover');
-      }
-    }
-    return retVal;
-  };
-
   // --
   // Init multidatepicker on input directly would be simpler, but a glitch
   //  would appear, so I init multidatespicker on an empty div#delivery_dates
