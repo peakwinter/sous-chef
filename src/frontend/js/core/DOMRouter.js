@@ -1,4 +1,5 @@
 /* eslint-env browser */
+/* global $ */
 
 class DOMRouter {
   constructor(controllers) {
@@ -17,6 +18,21 @@ class DOMRouter {
     }
   }
 
+  getAction(controller, action) {
+    if (controller !== '' && this.controllers[controller]
+        && typeof this.controllers[controller][action] == 'function') {
+      return this.controllers[controller][action];
+    }
+    return undefined;
+  }
+
+  listActions(controller) {
+    if (controller !== '' && this.controllers[controller]) {
+      return Object.keys(this.controllers[controller]);
+    }
+    return [];
+  }
+
   /**
    * Initializes the router object.
    */
@@ -24,11 +40,28 @@ class DOMRouter {
     if (document.body) {
       const body = document.body;
       const controller = body.getAttribute('data-controller');
-      const action = body.getAttribute('data-action');
+      const initialAction = body.getAttribute('data-action');
 
       if (controller) {
         this.execAction(controller, 'init');
-        this.execAction(controller, action);
+
+        this.listActions(controller).forEach((action) => {
+          if (action === 'init') {
+            return;
+          }
+
+          const target = $(`[data-action='${action}']`);
+          if (!target.length) {
+            return;
+          }
+
+          target.on(
+            target.data('actionOn') || 'click',
+            this.getAction(controller, action),
+          );
+        });
+
+        this.execAction(controller, initialAction);
       }
     }
   }
