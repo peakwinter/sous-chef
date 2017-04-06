@@ -1,4 +1,8 @@
-'use strict';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import named from 'vinyl-named';
+import webpack from 'webpack';
+import webpackStream from 'webpack-stream';
+import nodeExternals from 'webpack-node-externals';
 
 // Load Plugins
 // ==========================================
@@ -20,9 +24,9 @@ const validate = require('gulp-jsvalidate');
 // Paths
 // ==========================================
 // - Source path folders
-const SRC_SCSS = '../../src/frontend/scss';
-const SRC_JS = '../../src/frontend/js';
-const SRC_IMG = '../../src/frontend/images';
+const SRC_SCSS = './src/frontend/scss';
+const SRC_JS = './src/frontend/js';
+const SRC_IMG = './src/frontend/images';
 
 // - Source paths
 // Add any additional vendor or site files added to the appropriate property below.
@@ -31,48 +35,27 @@ const sources = {
   js: {
     scripts: {
       vendor: [
-        'node_modules/jquery-tablesort/jquery-tablesort.js',
-        'node_modules/jquery.formset/src/jquery.formset.js',
-        'node_modules/semantic-ui-calendar/dist/calendar.js',
+        'jquery-tablesort/jquery.tablesort',
+        'jquery.formset/src/jquery.formset',
+        'leaflet-routing-machine/dist/leaflet-routing-machine',
+        'leaflet-control-geocoder/dist/Control.Geocoder',
+        'leaflet.awesome-markers/dist/leaflet.awesome-markers',
+        'leaflet.icon.glyph/Leaflet.Icon.Glyph',
+        'sortablejs/Sortable',
+        'jquery-ui-multi-date-picker/dist/jquery-ui.multidatespicker',
       ],
       site: [
-        `${SRC_JS}/global.js`,
-        `${SRC_JS}/delivery.js`,
-        `${SRC_JS}/member.js`,
-        `${SRC_JS}/order.js`,
-        `${SRC_JS}/billing.js`,
-        `${SRC_JS}/page.js`,
-        `${SRC_JS}/note.js`,
+        `${SRC_JS}/App.js`,
       ]
     },
-    leaflet: {
-      vendor: [
-        'node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.js',
-        'node_modules/leaflet-control-geocoder/dist/Control.Geocoder.js',
-        'node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.js',
-        'node_modules/leaflet.icon.glyph/Leaflet.Icon.Glyph.js',
-        'node_modules/sortablejs/Sortable.js',
-      ],
-      site: [
-        `${SRC_JS}/custom-leaflet.js`,
-      ]
-    },
-    multiDatesPicker: {
-      vendor: [
-        'node_modules/jquery-ui-multi-date-picker/dist/jquery-ui.multidatespicker.js',
-      ],
-      site: [
-        `${SRC_JS}/multidatespicker.js`,
-      ]
-    }
   },
 
   css: {
     vendor: [
-      'node_modules/semantic-ui-calendar/dist/calendar.css',
-      'node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css',
-      'node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css',
-      'node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css',
+      'semantic-ui-calendar/dist/calendar.css',
+      'leaflet-routing-machine/dist/leaflet-routing-machine.css',
+      'leaflet-control-geocoder/dist/Control.Geocoder.css',
+      'leaflet.awesome-markers/dist/leaflet.awesome-markers.css',
     ],
     site: [
       `${SRC_SCSS}/main.scss`,
@@ -81,10 +64,10 @@ const sources = {
 
   img: {
     vendor: [
-      'node_modules/leaflet-routing-machine/dist/*.{png,svg}',
-      'node_modules/leaflet-control-geocoder/dist/images/*',
-      'node_modules/leaflet.awesome-markers/dist/images/*',
-      'node_modules/leaflet.icon.glyph/*.{png,svg}',
+      'leaflet-routing-machine/dist/*.{png,svg}',
+      'leaflet-control-geocoder/dist/images/*',
+      'leaflet.awesome-markers/dist/images/*',
+      'leaflet.icon.glyph/*.{png,svg}',
     ],
     site: [
       `${SRC_IMG}/**/*`,
@@ -94,10 +77,64 @@ const sources = {
 
 // - Destination path folders
 const destinations = {
-  css: '../../src/sous_chef/static/css',
-  js: '../../src/sous_chef/static/js',
-  img: '../../src/sous_chef/static/images'
+  base: './src/sous_chef/static',
+  css: './src/sous_chef/static/css',
+  js: './src/sous_chef/static/js',
+  img: './src/sous_chef/static/images',
 };
+
+
+const webpackConfig = {
+  entry: {
+    app: [`${SRC_JS}/App.js`, `${SRC_SCSS}/App.scss`],
+    vendor: sources.js.scripts.vendor.concat([`${SRC_SCSS}/Vendor.scss`])
+  },
+  output: {
+    filename: 'js/[name].js',
+  },
+  resolve: {
+    modules: ['node_modules'],
+    extensions: ['.webpack.js', '.web.js', '.js', '.jsx', '.json', 'scss'],
+    alias: {
+      'jquery-ui-dist': 'jquery-ui-dist/jquery-ui',
+    },
+  },
+  module: {
+    rules: [
+      {test: /\.jsx?$/, exclude: /node_modules/, use: 'babel-loader'},
+      {
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          use: ['css-loader', 'sass-loader'],
+          fallback: 'style-loader',
+          publicPath: '../',
+        }),
+      },
+      {test: /\.txt$/, use: 'raw-loader'},
+      {
+        test: /\.(png|jpg|jpeg|gif|svg|woff|woff2)([?]?.*)$/,
+        use: 'url-loader?limit=10000',
+      },
+      {test: /\.(eot|ttf|wav|mp3|otf)([?]?.*)$/, use: 'file-loader'},
+    ],
+  },
+  plugins: [
+    new ExtractTextPlugin({filename: 'css/[name].css', disable: false}),
+    ...([
+      new webpack.LoaderOptionsPlugin({minimize: true}),
+      new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}}),
+      new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.js'}),
+    ]),
+  ],
+};
+
+gulp.task('build-webpack-assets', () =>
+  gulp.src([`${SRC_JS}/App.js`, `${SRC_SCSS}/App.scss`, `${SRC_SCSS}/Vendor.scss`])
+    .pipe(named())
+    .pipe(webpackStream(webpackConfig, webpack))
+    .pipe(gulp.dest(destinations.base)),
+);
+
 
 // Tasks
 // ==========================================
@@ -132,34 +169,6 @@ gulp.task('scripts', () =>
     .pipe(gulp.dest(destinations.js))
 );
 
-gulp.task('scripts-leaflet', () =>
-  gulp.src([].concat(sources.js.leaflet.vendor).concat(sources.js.leaflet.site))
-    .pipe(concat('leaflet.js'))
-    .pipe(babel({presets: ['babel-preset-es2015'].map(require.resolve)}))
-    .pipe(gulp.dest(destinations.js))
-    .pipe(sourcemaps.init())
-    .pipe(bytediff.start())
-    .pipe(uglify())
-    .pipe(bytediff.stop(bytediffFormatter))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(destinations.js))
-);
-
-gulp.task('scripts-multidatespicker', () =>
-  gulp.src([].concat(sources.js.multiDatesPicker.vendor).concat(sources.js.multiDatesPicker.site))
-    .pipe(concat('multidatespicker.js'))
-    .pipe(babel({presets: ['babel-preset-es2015'].map(require.resolve)}))
-    .pipe(gulp.dest(destinations.js))
-    .pipe(sourcemaps.init())
-    .pipe(bytediff.start())
-    .pipe(uglify())
-    .pipe(bytediff.stop(bytediffFormatter))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(destinations.js))
-);
-
 gulp.task('images', () =>
   gulp.src([].concat(sources.img.vendor).concat(sources.img.site))
     .pipe(cache(imagemin({
@@ -171,22 +180,17 @@ gulp.task('images', () =>
 );
 
 gulp.task('default', () => {
-  gulp.start('styles', 'scripts-multidatespicker', 'scripts-leaflet', 'scripts',
-  'images');
+  gulp.start('styles', 'scripts', 'images');
 });
 
 gulp.task('watch', ['default'], () => {
   gulp.watch(`${SRC_SCSS}/**/*.scss`, ['styles']);
-  gulp.watch(`${SRC_JS}/**/*.js`, ['scripts-multidatespicker', 'scripts-leaflet', 'scripts']);
+  gulp.watch(`${SRC_JS}/**/*.js`, ['scripts']);
   gulp.watch(`${SRC_IMG}/**/*`, ['images']);
 });
 
 gulp.task('validate', () =>
-  gulp.src([]
-    .concat(sources.js.scripts.site)
-    .concat(sources.js.leaflet.site)
-    .concat(sources.js.multiDatesPicker.site)
-  )
+  gulp.src([].concat(sources.js.scripts.site))
   .pipe(debug())
   .pipe(validate())
   .on('error', onError)

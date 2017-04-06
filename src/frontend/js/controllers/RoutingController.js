@@ -1,10 +1,8 @@
 /* eslint-env browser, jquery */
 /* global L */
 /* global Mustache */
-/* global Sortable */
 
-// Javascript of the delivery application
-// ****************************************
+import Sortable from 'sortablejs';
 
 let control;  // global bind
 
@@ -44,8 +42,8 @@ function printMapAndItinerary() {
     $('.leaflet-routing-alt:not(.leaflet-routing-alt-minimized)');
 
   const templateVars = {
-    map_height: $('#main').height(),
-    map_width: $('#main').width(),
+    map_height: $('#mapid').height(),
+    map_width: $('#mapid').width(),
     pane_left: panePosition.left,
     pane_top: panePosition.top,
     map_imgs: mapImgs,
@@ -129,6 +127,82 @@ function groupWaypoints(waypoints) {
   }, {});
 
   return groupedWaypoints;
+}
+
+function saveRoute(ctrl) {
+  const wp = ctrl.getWaypoints();
+  const data = {route: [], members: []};
+  const routeId = $('#route_map').data('route');
+  const saveUrl = $('#route_map').data('save-url');
+  const canSave = $('#route_map').data('can-save');
+  if (canSave === 'no') {
+    return;
+  }
+  data.route.push({id: routeId});
+  // simplify waypoint into a list of member id in the map order
+  $.each(wp, (key, value) => {
+    if (typeof value.options.id !== 'undefined') {
+      data.members.push({id: value.options.id});
+    }
+  });
+
+  // Post simple list of members to server
+  $.ajax(saveUrl, {
+    data: JSON.stringify(data),
+    contentType: 'application/json; charset=utf-8',
+    type: 'POST',
+    dataType: 'json',
+  });
+}
+
+function saveVehicle(vehicle, successCallback, errorCallback) {
+  const data = {route: [], vehicle: ''};
+  const routeId = $('#route_map').data('route');
+  const saveVehicleUrl = $('#route_map').data('save-vehicle-url');
+  const canSave = $('#route_map').data('can-save');
+  if (canSave === 'no') {
+    return;
+  }
+  data.route.push({id: routeId});
+  data.vehicle = vehicle;
+  // Post simple list of members to server
+  $.ajax(saveVehicleUrl, {
+    data: JSON.stringify(data),
+    contentType: 'application/json; charset=utf-8',
+    type: 'POST',
+    dataType: 'json',
+    success: successCallback,
+    error: errorCallback,
+  });
+}
+
+/* This routine calculates the distance between two points (given the
+     latitude/longitude of those points).
+   Passed to function:
+     lat1, lon1 = Latitude and Longitude of point 1 (in decimal degrees)
+     lat2, lon2 = Latitude and Longitude of point 2 (in decimal degrees)
+     unit = the unit you desire for results
+       where: 'M' is statute miles (default)
+              'K' is kilometers
+              'N' is nautical miles
+*/
+function distance(lat1, lon1, lat2, lon2, unit) {
+  const radlat1 = (Math.PI * lat1) / 180;
+  const radlat2 = (Math.PI * lat2) / 180;
+  const theta = lon1 - lon2;
+  const radtheta = (Math.PI * theta) / 180;
+  let dist = (Math.sin(radlat1) * Math.sin(radlat2)) +
+    (Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta));
+  dist = Math.acos(dist);
+  dist *= 180 / Math.PI;
+  dist *= 60 * 1.1515;
+  if (unit === 'K') {
+    dist *= 1.609344;
+  }
+  if (unit === 'N') {
+    dist *= 0.8684;
+  }
+  return dist;
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -330,163 +404,95 @@ function mainMapInit(map) {
   });
 }
 
-function saveRoute(ctrl) {
-  const wp = ctrl.getWaypoints();
-  const data = {route: [], members: []};
-  const routeId = $('#route_map').data('route');
-  const saveUrl = $('#route_map').data('save-url');
-  const canSave = $('#route_map').data('can-save');
-  if (canSave === 'no') {
-    return;
-  }
-  data.route.push({id: routeId});
-  // simplify waypoint into a list of member id in the map order
-  $.each(wp, (key, value) => {
-    if (typeof value.options.id !== 'undefined') {
-      data.members.push({id: value.options.id});
-    }
-  });
+export default {
+  init() {
+    let marker;
+    let mymap;
 
-  // Post simple list of members to server
-  $.ajax(saveUrl, {
-    data: JSON.stringify(data),
-    contentType: 'application/json; charset=utf-8',
-    type: 'POST',
-    dataType: 'json',
-  });
-}
-
-function saveVehicle(vehicle, successCallback, errorCallback) {
-  const data = {route: [], vehicle: ''};
-  const routeId = $('#route_map').data('route');
-  const saveVehicleUrl = $('#route_map').data('save-vehicle-url');
-  const canSave = $('#route_map').data('can-save');
-  if (canSave === 'no') {
-    return;
-  }
-  data.route.push({id: routeId});
-  data.vehicle = vehicle;
-  // Post simple list of members to server
-  $.ajax(saveVehicleUrl, {
-    data: JSON.stringify(data),
-    contentType: 'application/json; charset=utf-8',
-    type: 'POST',
-    dataType: 'json',
-    success: successCallback,
-    error: errorCallback,
-  });
-}
-
-/* This routine calculates the distance between two points (given the
-     latitude/longitude of those points).
-   Passed to function:
-     lat1, lon1 = Latitude and Longitude of point 1 (in decimal degrees)
-     lat2, lon2 = Latitude and Longitude of point 2 (in decimal degrees)
-     unit = the unit you desire for results
-       where: 'M' is statute miles (default)
-              'K' is kilometers
-              'N' is nautical miles
-*/
-function distance(lat1, lon1, lat2, lon2, unit) {
-  const radlat1 = (Math.PI * lat1) / 180;
-  const radlat2 = (Math.PI * lat2) / 180;
-  const theta = lon1 - lon2;
-  const radtheta = (Math.PI * theta) / 180;
-  let dist = (Math.sin(radlat1) * Math.sin(radlat2)) +
-    (Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta));
-  dist = Math.acos(dist);
-  dist *= 180 / Math.PI;
-  dist *= 60 * 1.1515;
-  if (unit === 'K') {
-    dist *= 1.609344;
-  }
-  if (unit === 'N') {
-    dist *= 0.8684;
-  }
-  return dist;
-}
-
-$(() => {
-  let marker;
-  let mymap;
-
-  // Add map
-  if ($('#mapid').length > 0) {
-    // eslint-disable-next-line new-cap
-    mymap = new L.map('mapid').setView([45.516564, -73.575145], 18);
-    const tileUrl = 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
-    const layer = new L.TileLayer(tileUrl, {maxZoom: 18});
-    mymap.addLayer(layer);
-  }
-
-  $('#geocodeBtn').click((event) => {
-    // Display a loading indicator
-    $('form').addClass('loading');
-    const notFoundMsg = $(event.currentTarget).data('notFoundMsg');
-
-    // eslint-disable-next-line new-cap
-    const geocoder = new L.Control.Geocoder.nominatim({
-      geocodingQueryParams: {countrycodes: 'ca'},
-    });
-    // var yourQuery = "4846 rue cartier, Montreal, Qc";
-    const apt = '';
-    let street = '';
-    let city = '';
-    const zipcode = '';
-
-    if ($('.field > .street.name').val()) {
-      street = `${$('.field > .street.name').val()}&`;
-    }
-    if ($('.field > .city').val()) {
-      city = `${$('.field > .city').val()}&`;
+    // Add map
+    if ($('#mapid').length > 0) {
+      // eslint-disable-next-line new-cap
+      mymap = new L.map('mapid').setView([45.516564, -73.575145], 18);
+      const tileUrl = 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
+      const layer = new L.TileLayer(tileUrl, {maxZoom: 18});
+      mymap.addLayer(layer);
     }
 
-    const yourQuery = apt + street + city + zipcode;
+    $('#geocodeBtn').click((event) => {
+      // Display a loading indicator
+      $('form').addClass('loading');
+      const notFoundMsg = $(event.currentTarget).data('notFoundMsg');
 
-    geocoder.geocode(yourQuery, (results) => {
-      if (results.length > 0) {
-        const data = {
-          address: results[0].name,
-          lat: results[0].center.lat,
-          long: results[0].center.lng,
-        };
+      // eslint-disable-next-line new-cap
+      const geocoder = new L.Control.Geocoder.nominatim({
+        geocodingQueryParams: {countrycodes: 'ca'},
+      });
+      // var yourQuery = "4846 rue cartier, Montreal, Qc";
+      const apt = '';
+      let street = '';
+      let city = '';
+      const zipcode = '';
 
-        // calculate distance between santropol and the place found
-        const dist = distance(
-          45.516564, -73.575145, results[0].center.lat,
-          results[0].center.lng, 'K');
-
-        // update text field withe info
-        $('.field > .latitude').val(data.lat);
-        $('.field > .longitude').val(data.long);
-        $('.field .distance').val(dist);
-
-        // Add or update marker for the found address
-        if (typeof (marker) === 'undefined') {
-          marker = L.marker([data.lat, data.long], {draggable: true});
-          marker.addTo(mymap);
-          mymap.setView([data.lat, data.long], 17);
-        } else {
-          marker.setLatLng([data.lat, data.long]);
-          mymap.setView([data.lat, data.long], 17);
-        }
-
-        // Adjust latitude / longitude if user drag the marker
-        marker.on('dragend', (ev) => {
-          const chagedPos = ev.target.getLatLng();
-          $('.field > .latitude').val(chagedPos.lat);
-          $('.field > .longitude').val(chagedPos.lng);
-          const newdist = distance(
-            45.516564, -73.575145, chagedPos.lat, chagedPos.lng, 'K');
-          $('.field > .distance').val(newdist);
-        });
-      } else {
-        // eslint-disable-next-line no-alert
-        alert(notFoundMsg);
+      if ($('.field > .street.name').val()) {
+        street = `${$('.field > .street.name').val()}&`;
+      }
+      if ($('.field > .city').val()) {
+        city = `${$('.field > .city').val()}&`;
       }
 
-      // Remove the loading indicator
-      $('form').removeClass('loading');
+      const yourQuery = apt + street + city + zipcode;
+
+      geocoder.geocode(yourQuery, (results) => {
+        if (results.length > 0) {
+          const data = {
+            address: results[0].name,
+            lat: results[0].center.lat,
+            long: results[0].center.lng,
+          };
+
+          // calculate distance between santropol and the place found
+          const dist = distance(
+            45.516564, -73.575145, results[0].center.lat,
+            results[0].center.lng, 'K');
+
+          // update text field withe info
+          $('.field > .latitude').val(data.lat);
+          $('.field > .longitude').val(data.long);
+          $('.field .distance').val(dist);
+
+          // Add or update marker for the found address
+          if (typeof (marker) === 'undefined') {
+            marker = L.marker([data.lat, data.long], {draggable: true});
+            marker.addTo(mymap);
+            mymap.setView([data.lat, data.long], 17);
+          } else {
+            marker.setLatLng([data.lat, data.long]);
+            mymap.setView([data.lat, data.long], 17);
+          }
+
+          // Adjust latitude / longitude if user drag the marker
+          marker.on('dragend', (ev) => {
+            const chagedPos = ev.target.getLatLng();
+            $('.field > .latitude').val(chagedPos.lat);
+            $('.field > .longitude').val(chagedPos.lng);
+            const newdist = distance(
+              45.516564, -73.575145, chagedPos.lat, chagedPos.lng, 'K');
+            $('.field > .distance').val(newdist);
+          });
+        } else {
+          // eslint-disable-next-line no-alert
+          alert(notFoundMsg);
+        }
+
+        // Remove the loading indicator
+        $('form').removeClass('loading');
+      });
     });
-  });
-});
+
+    $('#id_print_directions').click(() => {
+      printMapAndItinerary();
+    });
+
+    mainMapInit(mymap);
+  },
+};

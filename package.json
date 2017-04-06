@@ -9,12 +9,16 @@
   "license": "AGPL-3.0",
   "private": true,
   "devDependencies": {
+    "babel-loader": "^6.4.1",
     "babel-preset-es2015": "^6.24.0",
+    "css-loader": "^0.28.0",
     "eslint": "^3.18.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.11.1",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-babel": "^6.1.2",
@@ -29,9 +33,18 @@
     "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^2.5.0",
     "gulp-uglify": "^2.1.2",
-    "gulp-watch": "^4.3.5"
+    "gulp-watch": "^4.3.5",
+    "sass-loader": "^6.0.3",
+    "script-loader": "^0.7.0",
+    "style-loader": "^0.16.1",
+    "url-loader": "^0.5.8",
+    "vinyl-named": "^1.1.0",
+    "webpack": "^2.3.3",
+    "webpack-node-externals": "^1.5.4",
+    "webpack-stream": "^3.2.0"
   },
   "dependencies": {
+    "jquery": "^3.2.1",
     "jquery-tablesort": "0.0.11",
     "jquery-ui-multi-date-picker": "^1.6.5",
     "jquery.formset": "^1.3.0",
@@ -40,6 +53,7 @@
     "leaflet.awesome-markers": "^2.0.4",
     "leaflet.icon.glyph": "^0.2.0",
     "semantic-ui-calendar": "0.0.7",
+    "semantic-ui-css": "^2.2.10",
     "sortablejs": "^1.5.1"
   },
   "scripts": {

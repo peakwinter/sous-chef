@@ -98,7 +98,7 @@ ENV/
 *.swp
 
 # Ignore some tools directories.
-tools/gulp
+node_modules
 tools/mariadb
 
 # Ignore generated assets.

@@ -1,19 +1,13 @@
 /* eslint-env browser, jquery */
 
-function dateFormatter(date) {
-  if (!date) return '';
-  let day = date.getDate();
-  let month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  if (month < 10) month = `0${month}`;
-  if (day < 10) day = `0${day}`;
-  return `${year}-${month}-${day}`;
-}
+import controllers from './controllers';
+import DOMRouter from './core/DOMRouter';
+import {dateFormatter} from './core/Utilities';
 
-$(() => {
-  // Javascript of the sous-chef application.
-  // **************************************
 
+// Defines the router and initializes it!
+const router = new DOMRouter(controllers);
+$(document).ready(() => {
   $('.ui.open-menu').on('click', () => {
     $('.ui.sidebar').sidebar('toggle');
   });
@@ -35,4 +29,7 @@ $(() => {
     type: 'date',
     formatter: {date: dateFormatter},
   });
+
+  // Initializes the router.
+  router.init();
 });
