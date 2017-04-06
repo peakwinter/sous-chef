@@ -10,6 +10,8 @@
 
 {% endblock %}
 
+{% block data_controller %}souschef:note{% endblock data_controller %}
+
 {% block subcontent %}
 {% has_perm 'sous_chef.edit' request.user as can_edit_data %}
 

@@ -4,6 +4,7 @@
 {% load rules %}
 
 {% block title %}{% trans 'Kitchen Count report' %} {% endblock %}
+{% block data_controller %}souschef:delivery{% endblock data_controller %}
 
 {% block content %}
 {% has_perm 'sous_chef.edit' request.user as can_edit_data %}

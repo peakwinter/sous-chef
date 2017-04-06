@@ -6,6 +6,7 @@
 {% load member_extras %}
 
 {% block title %} {% trans 'Place orders' %} {% endblock %}
+{% block data_controller %}souschef:order{% endblock data_controller %}
 
 {% block extrahead %}
 <link href="http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet">
@@ -179,11 +180,6 @@
     <script type="application/javascript">
       $.datepicker.setDefaults( $.datepicker.regional[ "{{ LANGUAGE_CODE }}" ] );
     </script>
-    {% if debug %}
-        <script src="{% static 'js/multidatespicker.js' %}" type="application/javascript"></script>
-    {% else %}
-        <script src="{% static 'js/multidatespicker.min.js' %}" type="application/javascript"></script>
-    {% endif %}
 
 {% comment %} Wash out jquery UI js on other semantic UI elements by importing it again. {% endcomment %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.js" type="application/javascript"></script>

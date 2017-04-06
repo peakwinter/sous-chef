@@ -5,11 +5,12 @@
 {% load rules %}
 
 {% block title %}{% trans "Organize the delivery route" %}: {{ route.name }} {% endblock %}
+{% block data_controller %}souschef:routing{% endblock data_controller %}
 
 {% block extrahead %}
-    {% load leaflet_tags %}
-    {% leaflet_css %}
     <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <style> #mapid {height: 500px;}</style>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +26,7 @@
 </div>
 
 <div class="ui basic segment no-print">
-    <a href="javascript:printMapAndItinerary()" class="ui labeled icon right pink basic big button" title="{% trans 'Print the map and directions' %}">
+    <a id="id_print_directions" href="#" class="ui labeled icon right pink basic big button" title="{% trans 'Print the map and directions' %}">
         <i class="print icon"></i>{% trans 'Map and Directions' %}
     </a>
 </div>
@@ -39,7 +40,7 @@
         data-selected-vehicle="{{ route.vehicle }}"
         data-save-vehicle-url="{% if can_edit_data %}{% url 'delivery:save_route_vehicle' %}{% endif %}"
         data-can-save="{{ can_edit_data|yesno:'yes,no' }}">
-    {% leaflet_map "main" callback="mainMapInit" %}
+    <div id="mapid"></div>
   </div>
   <div class="five wide column">
     <div class="controls"></div>
@@ -62,7 +63,7 @@
       <title>{% trans "Delivery route" %}: {{ route.name }} - {% now "j F Y" %}</title>
       <meta charset="utf-8">
       <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
-      {% leaflet_css %}
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" ref="stylesheet">
       <link href="{% static 'css/main.min.css' %}" type="text/css" rel="stylesheet">
       <style>
         hr {margin-top:2em;margin-bottom:2em}
@@ -127,12 +128,10 @@
 {% endblock %}
 
 {% block extrajs %}
-    {% leaflet_js %}
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     {% if debug %}
-        <script src="{% static 'js/leaflet.js' %}" type="application/javascript"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
     {% else %}
-        <script src="{% static 'js/leaflet.min.js' %}" type="application/javascript"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
     {% endif %}
 {% endblock %}

@@ -5,11 +5,10 @@
 {% load rules %}
 
 {% block title %}{% trans 'Routes Information' %} {% endblock %}
+{% block data_controller %}souschef:delivery{% endblock data_controller %}
 
 {% block extrahead %}
-    {% load leaflet_tags %}
-    {% leaflet_css %}
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" ref="stylesheet">
     <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
 {% endblock %}
 
@@ -75,10 +74,5 @@
 {% endblock %}
 
 {% block extrajs %}
-    {% leaflet_js %}
-    {% if debug %}
-        <script src="{% static 'js/leaflet.js' %}" type="application/javascript"></script>
-    {% else %}
-        <script src="{% static 'js/leaflet.min.js' %}" type="application/javascript"></script>
-    {% endif %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
 {% endblock %}

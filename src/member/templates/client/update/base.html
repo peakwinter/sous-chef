@@ -5,14 +5,14 @@
 
 {% block extrahead %}
     <style> #mapid {height: 250px;}</style>
-    {% load leaflet_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" ref="stylesheet">
 {% endblock %}
 
 {% block title %}
     {% trans "Update Client" %}
 {% endblock %}
+
+{% block data_controller %}souschef:member{% endblock data_controller %}
 
 {% block message %}
 <div class="ui text container">
@@ -68,9 +68,5 @@
 {% endblock %}
 
 {% block extrajs %}
-    {% if debug %}
-        <script src="{% static 'js/leaflet.js' %}" type="application/javascript"></script>
-    {% else %}
-        <script src="{% static 'js/leaflet.min.js' %}" type="application/javascript"></script>
-    {% endif %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
 {% endblock %}

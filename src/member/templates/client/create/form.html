@@ -9,10 +9,10 @@
 
 {% block extrahead %}
     <style> #mapid {height: 250px;}</style>
-    {% load leaflet_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" ref="stylesheet">
 {% endblock %}
+
+{% block data_controller %}souschef:member{% endblock data_controller %}
 
 {% block title %}
     {% if edit == True %}{% trans 'Edit existing client' %}{% else %}{% trans 'Create a new client ' %}{% endif %}
@@ -84,6 +84,7 @@
 {% endblock %}
 
 {% block extrajs %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
     {% if debug %}
         <script src="{% static 'js/leaflet.js' %}" type="application/javascript"></script>
     {% else %}

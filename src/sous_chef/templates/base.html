@@ -10,11 +10,15 @@
     </title>
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.css" rel="stylesheet">
-    <link href="{% static 'css/main.min.css' %}" type="text/css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-calendar/0.0.7/calendar.min.css" rel="stylesheet">
+
     {% block extrahead %}{% endblock %}
+
+    <link href="{% static 'css/vendor.css' %}" type="text/css" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" type="text/css" rel="stylesheet">
 </head>
 
-<body>
+<body data-controller="{% block data_controller %}{% endblock data_controller %}" data-action="{% block data_action %}{% endblock data_action %}">
     <!-- Responsive sidebar menu -->
     <div class="ui inverted vertical menu left sidebar">
         {% include "system/menu.html" %}
@@ -63,13 +67,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="application/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.js" type="application/javascript"></script>
-    {% if debug %}
-        <script src="{% static 'js/sous-chef.js' %}" type="application/javascript"></script>
-    {% else %}
-        <script src="{% static 'js/sous-chef.min.js' %}" type="application/javascript"></script>
-    {% endif %}
-    <!-- WARNING :  Do not move this line before a manual import of script! -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-calendar/0.0.7/calendar.min.js"></script>
+
     {% block extrajs %}{% endblock %}
+
+    <script src="{% static 'vendor.js' %}" type="application/javascript"></script>
+    <script src="{% static 'js/app.js' %}" type="application/javascript"></script>
 
     <script type="application/javascript">
       $(function () {
