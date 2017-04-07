@@ -5,7 +5,6 @@
 {% load rules %}
 
 {% block title %}{% trans "Client" %}{% endblock %}
-{% block data_controller %}souschef:member{% endblock data_controller %}
 
 {% block content %}
 {% has_perm 'sous_chef.edit' request.user as can_edit_data %}

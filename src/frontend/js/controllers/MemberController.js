@@ -1,11 +1,17 @@
 /* eslint-env browser, jquery */
 /* eslint max-statements:0 */
+/* global L */
 
-import {dateFormatter} from '../core/Utilities';
+import MapComponent from '../components/MapComponent';
+import {dateFormatter, distance} from '../core/Utilities';
+
+let mymap;
 
 
 export default {
   init() {
+    mymap = MapComponent.init();
+
     $('.ui.dropdown.member.status > .menu > .item').click((event) => {
       const value = $(event.currentTarget).data('value');
       const today = new Date();
@@ -110,7 +116,8 @@ export default {
       const commonParent = $(event.currentTarget).closest('div.ui.segment');
       $this.transition('scale');
       commonParent.find('.ui.add.form.member').transition('scale');
-      commonParent.find('.existing--member').val('').attr('disabled', 'disabled');
+      commonParent.find('.existing--member').val('')
+        .attr('disabled', 'disabled');
     });
 
     body.delegate('.ui.button.cancel.add.member', 'click', (event) => {
@@ -138,7 +145,8 @@ export default {
     if (formsetItems.length > 0) {
       formsetItems.formset({
         prefix: 'emergency_contacts',
-        addText: `<i class="plus icon"></i> ${formsetContainer.data('addLabel')}`,
+        addText:
+          `<i class="plus icon"></i> ${formsetContainer.data('addLabel')}`,
         deleteText:
           `<i class="remove icon"></i> ${formsetContainer.data('removeLabel')}`,
         added: (row) => {
@@ -206,5 +214,78 @@ export default {
       showUiAccordionSelectedDays();
       $('.ui.accordion.meals.default').hide();
     }
+  },
+
+  geocodeAddress(event) {
+    let marker;
+
+    // Display a loading indicator
+    $('form').addClass('loading');
+    const notFoundMsg = $(event.currentTarget).data('notFoundMsg');
+
+    // eslint-disable-next-line new-cap
+    const geocoder = new L.Control.Geocoder.nominatim({
+      geocodingQueryParams: {countrycodes: 'ca'},
+    });
+    // var yourQuery = "4846 rue cartier, Montreal, Qc";
+    const apt = '';
+    let street = '';
+    let city = '';
+    const zipcode = '';
+
+    if ($('.field > .street.name').val()) {
+      street = `${$('.field > .street.name').val()}&`;
+    }
+    if ($('.field > .city').val()) {
+      city = `${$('.field > .city').val()}&`;
+    }
+
+    const yourQuery = apt + street + city + zipcode;
+
+    geocoder.geocode(yourQuery, (results) => {
+      if (results.length > 0) {
+        const data = {
+          address: results[0].name,
+          lat: results[0].center.lat,
+          long: results[0].center.lng,
+        };
+
+        // calculate distance between santropol and the place found
+        const dist = distance(
+          45.516564, -73.575145, results[0].center.lat,
+          results[0].center.lng, 'K');
+
+        // update text field withe info
+        $('.field > .latitude').val(data.lat);
+        $('.field > .longitude').val(data.long);
+        $('.field .distance').val(dist);
+
+        // Add or update marker for the found address
+        if (typeof (marker) === 'undefined') {
+          marker = L.marker([data.lat, data.long], {draggable: true});
+          marker.addTo(mymap);
+          mymap.setView([data.lat, data.long], 17);
+        } else {
+          marker.setLatLng([data.lat, data.long]);
+          mymap.setView([data.lat, data.long], 17);
+        }
+
+        // Adjust latitude / longitude if user drag the marker
+        marker.on('dragend', (ev) => {
+          const chagedPos = ev.target.getLatLng();
+          $('.field > .latitude').val(chagedPos.lat);
+          $('.field > .longitude').val(chagedPos.lng);
+          const newdist = distance(
+            45.516564, -73.575145, chagedPos.lat, chagedPos.lng, 'K');
+          $('.field > .distance').val(newdist);
+        });
+      } else {
+        // eslint-disable-next-line no-alert
+        alert(notFoundMsg);
+      }
+
+      // Remove the loading indicator
+      $('form').removeClass('loading');
+    });
   },
 };

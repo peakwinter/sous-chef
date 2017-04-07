@@ -4,14 +4,13 @@
 
 import Sortable from 'sortablejs';
 
-import {distance} from '../core/Utilities';
+import MapComponent from '../components/MapComponent';
 
 let control;  // global bind
 let defaultVehicle;
 
 // eslint-disable-next-line max-len
 const MAPBOX_API_KEY = 'pk.eyJ1IjoicmphY3F1ZW1pbiIsImEiOiJjaXAxaWpxdGkwMm5ydGhtNG84eGdjbGthIn0.TdwCw6vhAJdgxzH0JBp6iA';
-const TILE_URL = 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
 
 
 // Parse waypoints. If they are within 5 decimal places of tolerance with
@@ -113,98 +112,12 @@ class RoutingPlan extends L.Routing.Plan {
 
 export default {
   init() {
-    let marker;
-    let mymap;
-
     // Add map
-    if ($('#mapid').length > 0) {
-      // eslint-disable-next-line new-cap
-      mymap = new L.map('mapid').setView([45.516564, -73.575145], 18);
-    }
-
-    $('#geocodeBtn').click((event) => {
-      // Display a loading indicator
-      $('form').addClass('loading');
-      const notFoundMsg = $(event.currentTarget).data('notFoundMsg');
-
-      // eslint-disable-next-line new-cap
-      const geocoder = new L.Control.Geocoder.nominatim({
-        geocodingQueryParams: {countrycodes: 'ca'},
-      });
-      // var yourQuery = "4846 rue cartier, Montreal, Qc";
-      const apt = '';
-      let street = '';
-      let city = '';
-      const zipcode = '';
-
-      if ($('.field > .street.name').val()) {
-        street = `${$('.field > .street.name').val()}&`;
-      }
-      if ($('.field > .city').val()) {
-        city = `${$('.field > .city').val()}&`;
-      }
-
-      const yourQuery = apt + street + city + zipcode;
-
-      geocoder.geocode(yourQuery, (results) => {
-        if (results.length > 0) {
-          const data = {
-            address: results[0].name,
-            lat: results[0].center.lat,
-            long: results[0].center.lng,
-          };
-
-          // calculate distance between santropol and the place found
-          const dist = distance(
-            45.516564, -73.575145, results[0].center.lat,
-            results[0].center.lng, 'K');
-
-          // update text field withe info
-          $('.field > .latitude').val(data.lat);
-          $('.field > .longitude').val(data.long);
-          $('.field .distance').val(dist);
-
-          // Add or update marker for the found address
-          if (typeof (marker) === 'undefined') {
-            marker = L.marker([data.lat, data.long], {draggable: true});
-            marker.addTo(mymap);
-            mymap.setView([data.lat, data.long], 17);
-          } else {
-            marker.setLatLng([data.lat, data.long]);
-            mymap.setView([data.lat, data.long], 17);
-          }
-
-          // Adjust latitude / longitude if user drag the marker
-          marker.on('dragend', (ev) => {
-            const chagedPos = ev.target.getLatLng();
-            $('.field > .latitude').val(chagedPos.lat);
-            $('.field > .longitude').val(chagedPos.lng);
-            const newdist = distance(
-              45.516564, -73.575145, chagedPos.lat, chagedPos.lng, 'K');
-            $('.field > .distance').val(newdist);
-          });
-        } else {
-          // eslint-disable-next-line no-alert
-          alert(notFoundMsg);
-        }
-
-        // Remove the loading indicator
-        $('form').removeClass('loading');
-      });
-    });
-
+    const mymap = MapComponent.init();
     this.mainMapInit(mymap);
   },
 
   mainMapInit(map) {
-    // create a new tile layer wiyh bike path
-    // (http://thunderforest.com/maps/opencyclemap/)
-    const layer = new L.TileLayer(TILE_URL, {maxZoom: 18});
-
-    // add the layer to the map and center it on santropol
-    map.addLayer(layer);
-    map.setView(new L.LatLng(45.516564, -73.575145), 13);
-
     // Create bike router using mapbox
     const bikerouter = L.Routing.mapbox(MAPBOX_API_KEY);
     defaultVehicle = $('#route_map').data('selected-vehicle');
