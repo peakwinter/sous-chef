@@ -1,5 +1,6 @@
 /* eslint-env browser, jquery */
-/* global L */
+
+import L from 'leaflet';
 
 const TILE_URL = 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
 

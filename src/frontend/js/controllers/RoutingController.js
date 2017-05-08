@@ -1,7 +1,8 @@
-/* eslint-env browser, jquery */
-/* global L */
-/* global Mustache */
+/* eslint-env browser */
 
+import $ from 'jquery';
+import L from 'leaflet';
+import Mustache from 'mustache';
 import Sortable from 'sortablejs';
 
 import MapComponent from '../components/MapComponent';

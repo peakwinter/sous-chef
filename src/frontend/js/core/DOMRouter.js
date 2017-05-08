@@ -1,5 +1,6 @@
 /* eslint-env browser */
-/* global $ */
+
+import $ from 'jquery';
 
 class DOMRouter {
   constructor(controllers) {

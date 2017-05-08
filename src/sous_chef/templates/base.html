@@ -9,14 +9,9 @@
         {% block title %}{% trans "Sous-Chef" %}{% endblock %}
     </title>
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-calendar/0.0.7/calendar.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-
-    {% block extrahead %}{% endblock %}
-
     <link href="{% static 'css/vendor.css' %}" type="text/css" rel="stylesheet">
     <link href="{% static 'css/main.css' %}" type="text/css" rel="stylesheet">
+    {% block extrahead %}{% endblock %}
 </head>
 
 <body data-controller="{% block data_controller %}{% endblock data_controller %}" data-action="{% block data_action %}{% endblock data_action %}">
@@ -66,23 +61,11 @@
     </div>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="application/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.js" type="application/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-calendar/0.0.7/calendar.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="{% static 'vendor.js' %}" type="application/javascript"></script>
 
     {% block extrajs %}{% endblock %}
 
-    <script src="{% static 'vendor.js' %}" type="application/javascript"></script>
     <script src="{% static 'js/app.js' %}" type="application/javascript"></script>
-
-    <script type="application/javascript">
-      $(function () {
-        $(".ui.dropdown > select[required]").each(function () {
-          $(this).removeAttr('required');
-        });
-      });  // Don't use HTML5 validation on hidden <select> elements that are replaced by Semantic UI.
-    </script>
 </body>
 
 </html>

@@ -1,4 +1,6 @@
-/* eslint-env browser, jquery */
+/* eslint-env browser */
+
+import $ from 'jquery';
 
 import controllers from './controllers';
 import DOMRouter from './core/DOMRouter';
@@ -28,6 +30,12 @@ $(document).ready(() => {
   $('.ui.calendar').calendar({
     type: 'date',
     formatter: {date: dateFormatter},
+  });
+
+  // Don't use HTML5 validation on hidden <select> elements that are
+  //  replaced by Semantic UI.
+  $('.ui.dropdown > select[required]').each((event) => {
+    $(event.currentTarget).removeAttr('required');
   });
 
   // Initializes the router.

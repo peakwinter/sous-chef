@@ -35,18 +35,20 @@ const sources = {
   js: {
     scripts: {
       vendor: [
-        'jquery-tablesort/jquery.tablesort',
+        'jquery-ui-multi-date-picker/dist/jquery-ui.multidatespicker',
+        'jquery-tablesort',
         'jquery.formset/src/jquery.formset',
+        'semantic-ui-css',
+        'semantic-ui-calendar/src/definitions/modules/calendar',
+        'leaflet',
         'leaflet-routing-machine/dist/leaflet-routing-machine',
         'leaflet-control-geocoder/dist/Control.Geocoder',
         'leaflet.awesome-markers/dist/leaflet.awesome-markers',
         'leaflet.icon.glyph/Leaflet.Icon.Glyph',
-        'sortablejs/Sortable',
-        'jquery-ui-multi-date-picker/dist/jquery-ui.multidatespicker',
       ],
       site: [
         `${SRC_JS}/App.js`,
-      ]
+      ],
     },
   },
 
@@ -59,7 +61,7 @@ const sources = {
     ],
     site: [
       `${SRC_SCSS}/main.scss`,
-    ]
+    ],
   },
 
   img: {
@@ -71,8 +73,8 @@ const sources = {
     ],
     site: [
       `${SRC_IMG}/**/*`,
-    ]
-  }
+    ],
+  },
 };
 
 // - Destination path folders
@@ -87,7 +89,7 @@ const destinations = {
 const webpackConfig = {
   entry: {
     app: [`${SRC_JS}/App.js`, `${SRC_SCSS}/App.scss`],
-    vendor: sources.js.scripts.vendor.concat([`${SRC_SCSS}/Vendor.scss`])
+    vendor: sources.js.scripts.vendor.concat([`${SRC_SCSS}/Vendor.scss`]),
   },
   output: {
     filename: 'js/[name].js',
@@ -96,6 +98,7 @@ const webpackConfig = {
     modules: ['node_modules'],
     extensions: ['.webpack.js', '.web.js', '.js', '.jsx', '.json', 'scss'],
     alias: {
+      jquery: 'jquery/src/jquery',
       'jquery-ui-dist': 'jquery-ui-dist/jquery-ui',
     },
   },
@@ -119,6 +122,12 @@ const webpackConfig = {
     ],
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jquery: 'jquery',
+      jQuery: 'jquery',
+      L: 'leaflet',
+    }),
     new ExtractTextPlugin({filename: 'css/[name].css', disable: false}),
     ...([
       new webpack.LoaderOptionsPlugin({minimize: true}),
@@ -141,18 +150,18 @@ gulp.task('build-webpack-assets', () =>
 
 gulp.task('styles', () =>
   gulp.src([].concat(sources.css.vendor).concat(sources.css.site))
-    .pipe(sass({ style: 'expanded', errLogToConsole: true }))
+    .pipe(sass({style: 'expanded', errLogToConsole: true}))
     .pipe(autoprefixer({
       browsers: ['last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'],
-      cascade: false
+      cascade: false,
     }))
     .pipe(concat('main.css'))
     .pipe(bytediff.start())
     .pipe(gulp.dest('/tmp/css'))
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(rename({suffix: '.min'}))
     .pipe(minifycss())
     .pipe(bytediff.stop(bytediffFormatter))
-    .pipe(gulp.dest(destinations.css))
+    .pipe(gulp.dest(destinations.css)),
 );
 
 gulp.task('scripts', () =>
@@ -164,9 +173,9 @@ gulp.task('scripts', () =>
     .pipe(bytediff.start())
     .pipe(uglify())
     .pipe(bytediff.stop(bytediffFormatter))
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(rename({suffix: '.min'}))
     .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(destinations.js))
+    .pipe(gulp.dest(destinations.js)),
 );
 
 gulp.task('images', () =>
@@ -174,9 +183,9 @@ gulp.task('images', () =>
     .pipe(cache(imagemin({
       optimizationLevel: 3,
       progressive: true,
-      interlaced: true
+      interlaced: true,
     })))
-    .pipe(gulp.dest(destinations.img))
+    .pipe(gulp.dest(destinations.img)),
 );
 
 gulp.task('default', () => {
@@ -193,20 +202,20 @@ gulp.task('validate', () =>
   gulp.src([].concat(sources.js.scripts.site))
   .pipe(debug())
   .pipe(validate())
-  .on('error', onError)
+  .on('error', onError),
 );
 
 
 // Log errors on JS validation problems.
 function onError(error) {
- console.log(error.message);
+  console.log(error.message);
 
- if (error.plugin === 'gulp-jsvalidate') {
-   console.log('In file: ' + error.fileName);
- }
+  if (error.plugin === 'gulp-jsvalidate') {
+    console.log('In file: ' + error.fileName);
+  }
 
- process.exit(1);
-};
+  process.exit(1);
+}
 
 // Tell us how much our files have been compressed after minification.
 function bytediffFormatter(data) {
@@ -214,8 +223,8 @@ function bytediffFormatter(data) {
   `kB to ${(data.endSize / 1000).toFixed(2)} kB and is ` +
   `${formatPercent(1 - data.percent, 2)}% ` +
   `${(data.savings > 0) ? 'smaller' : 'larger'}.`;
-};
+}
 
 function formatPercent(num, precision) {
   return (num * 100).toFixed(precision);
-};
+}

@@ -1,4 +1,4 @@
-/* eslint-env browser, jquery */
+/* eslint-env browser */
 
 import $ from 'jquery';
 import {monthFormatter} from '../core/Utilities';

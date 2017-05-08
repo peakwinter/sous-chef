@@ -1,6 +1,7 @@
-/* eslint-env browser, jquery */
+/* eslint-env browser */
 /* eslint max-statements:0 */
 
+import $ from 'jquery';
 
 function dismissFieldError(elem) {
   $(elem).closest('.error').removeClass('error');

@@ -1,6 +1,7 @@
 /* eslint-env browser, jquery */
 /* eslint max-statements:0 */
-/* global L */
+
+import L from 'leaflet';
 
 import MapComponent from '../components/MapComponent';
 import {dateFormatter, distance} from '../core/Utilities';
